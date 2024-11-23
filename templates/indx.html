@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Scanner</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align:center; }
+        .ip-field { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>IP Scanner</h1>
+    
+    <div id="form-container">
+        <select id="ip-type">
+            <option value="single">Single</option>
+            <option value="range">Range</option>
+            <option value="cidr">CIDR</option>
+        </select>
+        
+        <input type="text" id="ip-input" class="ip-field" placeholder="Enter IP address">
+        <button onclick="addIpField()">+</button>
+        <button onclick="startScan()">Scan</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        function addIpField() {
+            let container = document.getElementById('form-container');
+            let newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.classList.add('ip-field');
+            newInput.placeholder = 'Enter IP address';
+            container.appendChild(newInput);
+        }
+
+        function startScan() {
+            let ipFields = document.querySelectorAll('.ip-field');
+            let ips = Array.from(ipFields).map(input => input.value).join();
+            
+            fetch('/scan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ips: ips})
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            });
+        }
+    </script>
+</body>
+</html>
